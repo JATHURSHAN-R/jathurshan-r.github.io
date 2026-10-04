@@ -47,14 +47,27 @@ On Windows you can use `py` instead of `python3`. Open http://localhost:8000. St
 
 Git stores your change history. Revert the commit that introduced a problem, then push to `main`. The publishing workflow deploys the restored version. Keep a copy of the old CV if you need easy comparisons.
 
-## What is automatic
+## Automatic HTB updates
 
-- Website deployment after a push to `main`.
-- Content validation before deployment.
+The publishing workflow refreshes HTB progress every six hours (00:23, 06:23, 12:23 and 18:23 UTC), on pushes to main, and through Actions > Publish portfolio > Run workflow. Scheduled start times may be delayed by GitHub. It is polling, not an instant HTB webhook.
 
-HTB and THM statistics are manual snapshots. No live API integration is enabled. Automatic platform syncing requires a verified, permitted data feed and a separate scheduled update workflow. Never put account passwords, session cookies or API tokens into these public files.
+Required repository secret: `HTB_API_TOKEN`. Set it under Settings > Secrets and variables > Actions. Never put its value in source files, issues or screenshots. The secret is available only to the sync step, not the deployed website.
 
-The original terminal has been removed. The site includes a lightweight abstract canvas animation, standard navigation, expandable project details and evidence dialogs. No ChatGPT login or Sites service is needed on GitHub Pages.
+The sync reads three fixed profile endpoints on `labs.hackthebox.com` for user `2170950`:
+
+- `GET /api/v4/user/profile/basic/2170950`: system owns and user owns.
+- `GET /api/v4/user/profile/progress/challenges/2170950`: solved challenges.
+- `GET /api/v5/user/profile/activity/2170950`: recent user/root machine-flag activity from the returned page.
+
+These routes were verified with this account; they are not treated as a guaranteed stable public API. Rank and level are deliberately not copied: the v4 rank differed from the newer profile display. Rank, level, season, streak, THM statistics, and screenshots remain manual snapshots. A user flag is explicitly labelled as user activity, not full machine completion.
+
+Only the allowlisted counts, machine activity name/label, and UTC sync time are merged into content.json in the temporary runner workspace. Raw API responses and the token are never written to disk or logged. Sync values are not committed back to GitHub. The site's displayed timestamp is the last successful fetch; editing content.json still controls all manual fields.
+
+If the token expires, requests fail, or response validation fails, the build stops before publishing, preserving the last successful live deployment. Fix the secret or integration and run the workflow again. The existing timestamp lets visitors see how old the data is. Check Actions for failures. GitHub can disable scheduled workflows in inactive public repositories; re-enable the workflow if necessary.
+
+The workflow uses read-only repository access and commit-pinned official GitHub Actions. Only the deploy job receives Pages write and OIDC permissions. API redirects are refused. To pause automation, remove the schedule entry; pushes will still sync. To fully disconnect HTB, remove the refresh step and revoke the HTB token, then maintain the counts manually.
+
+No terminal interface, database, or third-party runtime script is required.
 
 ## Validation and known limitation
 

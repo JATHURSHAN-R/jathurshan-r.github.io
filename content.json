@@ -30,5 +30,10 @@
   "project_2_title": "DVWA DevSecOps",
   "project_2_description": "Security scanning and build validation for a containerised PHP application.",
   "project_3_title": "Northwind CTF",
-  "project_3_description": "Six stages of hands-on learning, from OSINT to Linux privilege escalation."
+  "project_3_description": "Six stages of hands-on learning, from OSINT to Linux privilege escalation.",
+  "htb_system_owns": "11",
+  "htb_user_owns": "12",
+  "htb_synced_at": "Not yet synced in this build",
+  "htb_activity_name": "Nimbus",
+  "htb_activity_label": "user flag recorded"
 }
