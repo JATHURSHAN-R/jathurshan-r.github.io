@@ -14,7 +14,7 @@ def main():
         print('HTB_API_TOKEN is missing; no request sent.')
         return 1
     opener = urllib.request.build_opener(NoRedirect())
-    paths = {'basic_v5': 'v5/user/profile/basic', 'activity': 'v5/user/profile/activity', 'challenges': 'v4/user/profile/progress/challenges'}
+    paths = {'basic': 'v4/user/profile/basic', 'activity': 'v5/user/profile/activity', 'challenges': 'v4/user/profile/progress/challenges'}
     ok = True
     for label, path in paths.items():
         req = urllib.request.Request(
@@ -45,7 +45,7 @@ def main():
                 owns = profile.get('challenge_owns')
                 if isinstance(owns,dict):
                     print('challenge counters: ' + json.dumps({k:v for k,v in owns.items() if k.isidentifier() and type(v) is int and 0<=v<=1000000}))
-            activity = data.get('profile', data.get('activity'))
+            activity = data.get('profile', data.get('activity', data.get('data')))
             if isinstance(activity,dict):
                 activity = activity.get('activity')
             if isinstance(activity,list) and activity:
