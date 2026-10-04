@@ -3,6 +3,7 @@ from pathlib import Path
 import html
 import json
 import re
+from urllib.parse import urlsplit
 from html.parser import HTMLParser
 
 ROOT = Path(__file__).resolve().parent
@@ -45,7 +46,7 @@ for ref in check.refs:
     elif re.match(r'^[a-zA-Z][a-zA-Z0-9+.-]*:', ref):
         if not ref.startswith(('https://', 'mailto:')):
             raise ValueError('Only HTTPS and email links are allowed: ' + ref)
-    elif not (ROOT / 'site' / ref).is_file():
+    elif not (ROOT / 'site' / urlsplit(ref).path).is_file():
         raise ValueError('Missing local asset: ' + ref)
 
 (ROOT / 'site/index.html').write_text(result, encoding='utf-8')
