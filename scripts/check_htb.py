@@ -18,10 +18,11 @@ def main():
     ok = True
     for label, path in paths.items():
         req = urllib.request.Request(
-            f'https://app.hackthebox.com/api/v4/user/profile/{path}/2170950',
+            f'https://labs.hackthebox.com/api/v4/user/profile/{path}/2170950',
             headers={'Authorization': 'Bearer ' + token, 'Accept': 'application/json', 'User-Agent': 'Flame77-Portfolio/1.0'})
         try:
             with opener.open(req, timeout=25) as response:
+                print(label + ': HTTP ' + str(response.status) + '; JSON content type: ' + str('json' in response.headers.get('Content-Type','').lower()))
                 raw = response.read(1024 * 1024 + 1)
                 if len(raw) > 1024 * 1024:
                     raise ValueError('response size')
@@ -44,8 +45,8 @@ def main():
         except urllib.error.HTTPError as exc:
             print(label + ': HTTP ' + str(exc.code) + '; response omitted.')
             ok = False
-        except Exception:
-            print(label + ': request or JSON validation failed; details omitted.')
+        except Exception as exc:
+            print(label + ': ' + type(exc).__name__ + '; details omitted.')
             ok = False
     return 0 if ok else 1
 
