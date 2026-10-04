@@ -14,11 +14,11 @@ def main():
         print('HTB_API_TOKEN is missing; no request sent.')
         return 1
     opener = urllib.request.build_opener(NoRedirect())
-    paths = {'basic': 'basic', 'machines': 'progress/machines/os', 'challenges': 'progress/challenges'}
+    paths = {'basic_v5': 'v5/user/profile/basic', 'activity': 'v5/user/profile/activity', 'challenges': 'v4/user/profile/progress/challenges'}
     ok = True
     for label, path in paths.items():
         req = urllib.request.Request(
-            f'https://labs.hackthebox.com/api/v4/user/profile/{path}/2170950',
+            f'https://labs.hackthebox.com/api/{path}/2170950',
             headers={'Authorization': 'Bearer ' + token, 'Accept': 'application/json', 'User-Agent': 'Flame77-Portfolio/1.0'})
         try:
             with opener.open(req, timeout=25) as response:
@@ -42,6 +42,17 @@ def main():
                     elif key == 'rank' and isinstance(value,str) and len(value)<40 and all(c.isalpha() or c in ' -' for c in value):
                         safe[key] = value
                 print(label + ' selected achievement fields: ' + json.dumps(safe))
+                owns = profile.get('challenge_owns')
+                if isinstance(owns,dict):
+                    print('challenge counters: ' + json.dumps({k:v for k,v in owns.items() if k.isidentifier() and type(v) is int and 0<=v<=1000000}))
+            activity = data.get('profile', data.get('activity'))
+            if isinstance(activity,dict):
+                activity = activity.get('activity')
+            if isinstance(activity,list) and activity:
+                item=activity[0]
+                if isinstance(item,dict):
+                    print('activity item schema: ' + json.dumps({k:type(v).__name__ for k,v in item.items() if k.isidentifier()}))
+                    print('activity public fields: ' + json.dumps({k:v for k,v in item.items() if k in ('name','type','object_type','date','date_diff','flag_type') and isinstance(v,str) and len(v)<100}))
         except urllib.error.HTTPError as exc:
             print(label + ': HTTP ' + str(exc.code) + '; response omitted.')
             ok = False
